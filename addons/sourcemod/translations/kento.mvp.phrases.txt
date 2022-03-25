@@ -1,0 +1,110 @@
+"Phrases"
+{
+	"No MVP"
+	{
+		"#format"		""
+		"en"			"No Custom MVP Anthem"
+	}
+
+	"Vol Menu Title"
+	{
+		"#format"		""
+		"en"			"Select MVP Anthem Volume"
+	}
+
+	"MVP Menu Title"
+	{
+		"#format"		""
+		"en"			"Select Your Custom MVP Anthem"
+	}
+
+	"Vol Menu Title 2"
+	{
+		"#format"		"{1:.2f}"
+		"en"			"Select MVP Anthem Volume\nCurrent Volume:{1}\nUse !mvpvol for fine tuning"
+	}
+
+	"Mute"
+	{
+		"#format"		""
+		"en"			"Mute"
+	}
+
+	"MVP Menu Title 2"
+	{
+		"#format"		"{1:s}"
+		"en"			"Select Your Custom MVP Anthem\nSelected:{1}"
+	}
+
+	"Setting Menu Title"
+	{
+		"#format"		"{1:s},{2:.2f}"
+		"en"			"MVP Anthem Menu\nSelected:{1}\nVolume:{2}"
+	}
+
+	"MVP"
+	{
+		"#format"		"{1:N},{2:s}"
+		"en"			"Playing <font color='#B15BFF'>{1}</font>s MVP Anthem - <font color='#FF0000'>{2}</font>"
+	}
+
+	"Selected"
+	{
+		"#format"		"{1:s}"
+		"en"			"[{DARKRED}MVP{DEFAULT}] Your MVP Anthem is {purple}{1}."
+	}
+
+	"No Selected"
+	{
+		"#format"		""
+		"en"			"[{DARKRED}MVP{DEFAULT}] Your MVP Anthem is {purple}No MVP Anthem{DEFAULT}."
+	}
+
+	"Volume 1"
+	{
+		"#format"		""
+		"en"			"[{DARKRED}MVP{DEFAULT}] Volume values must be {DARKRED}0.0- 1.0"
+	}
+
+	"Volume 2"
+	{
+		"#format"		"{1:.2f}"
+		"en"			"[{DARKRED}MVP{DEFAULT}] Volume is set to {purple}{1}"
+	}
+	
+	"Preview"
+	{
+		"#format"		"{1:s}"
+		"en"			"[{DARKRED}MVP{DEFAULT}] Preview for {purple}{1}{DEFAULT}."
+	}
+
+	"Save MVP Anthem"
+	{
+		"#format"		"{1:s}"
+		"en"			"[{DARKRED}MVP{DEFAULT}] Your MVP Anthem is {purple}{1}{DEFAULT}."
+	}
+	
+	"Save MVP Anthem - None"
+	{
+		"#format"		""
+		"en"			"[{DARKRED}MVP{DEFAULT}] Your MVP Anthem is {purple}No MVP Anthem{DEFAULT}."
+	}
+
+	"MVP Anthem Random"
+	{
+		"#format"		"{1:s}"
+		"en"			"[{DARKRED}MVP{DEFAULT}] Now playing random MVP Anthem - {purple}{1}"
+	}
+
+	"MVP Anthem"
+	{
+		"#format"		"{1:N},{2:s}"
+		"en"			"[{DARKRED}MVP{DEFAULT}] Now playing {DARKRED}{1}{DEFAULT}'s MVP Anthem - {purple}{2}"
+	}
+
+	"Select MVP Anthem"
+	{
+		"#format"		"{1:s}"
+		"en"			"Select Your Custom MVP Anthem\nSelected: {1}"
+	}
+}	
