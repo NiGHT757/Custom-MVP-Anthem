@@ -7,6 +7,7 @@ Simplified & optimized version of [Custom MVP Anthem](https://forums.alliedmods.
 # Features:
 - Preview / Equip MVP
 - Play a random mvp if the client does not have a selected mvp
+- Steamids + Flags support
 
 # Instalation
 Unpack and upload the files on the server
