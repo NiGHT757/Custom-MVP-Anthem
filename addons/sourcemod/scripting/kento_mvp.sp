@@ -22,11 +22,15 @@
 #include <sdktools>
 #include <multicolors>
 
+#define STEAMID_LIMIT 12 // steamids limit per MVP.
+
 int g_iMVPCounter;
 int g_iDisplayAt[MAXPLAYERS+1];
 
 StringMap g_hMVPName;
 StringMap g_hMVPPath;
+StringMap g_hSteamids;
+StringMap g_hMVPFlags;
 
 char g_sSelectedMVP[MAXPLAYERS + 1][64];
 
@@ -35,13 +39,13 @@ Handle g_hCookie;
 
 float g_fVolume[MAXPLAYERS + 1];
 
-bool g_bLateLoad = false;
+bool g_bLateLoad;
 
 public Plugin myinfo =
 {
 	name = "[CS:GO] Custom MVP Anthem",
 	author = "Kento, .NiGHT",
-	version = "3.0",
+	version = "3.1",
 	description = "Custom MVP Anthem",
 	url = "https://github.com/NiGHT757/Custom-MVP-Anthem"
 };
@@ -57,7 +61,9 @@ public void OnPluginStart()
 
 	g_hMVPName = new StringMap();
 	g_hMVPPath = new StringMap();
-	
+	g_hSteamids = new StringMap();
+	g_hMVPFlags = new StringMap();
+
 	g_hCookie = RegClientCookie("mvp_settings", "Player's MVP Anthem", CookieAccess_Private);
 
 	SetCookieMenuItem(Mvp_Settings, 0, "MVP Anthem");
@@ -94,7 +100,10 @@ public void OnClientCookiesCached(int client)
 		ExplodeString(sCookie, ";", sExplode, 2, 128); // sound + volume
 		if(sExplode[0][0] && g_hMVPPath.GetString(sExplode[0], sCookie, sizeof(sCookie)))
 		{
-			strcopy(g_sSelectedMVP[client], sizeof(g_sSelectedMVP[]), sExplode[0]);
+			if(UTIL_GetAccess(client, sExplode[0]) && UTIL_GetFlagAccess(client, sExplode[0]))
+				strcopy(g_sSelectedMVP[client], sizeof(g_sSelectedMVP[]), sExplode[0]);
+			else
+				g_sSelectedMVP[client][0] = '\0';
 		}
 		else{
 			g_sSelectedMVP[client][0] = '\0';
@@ -175,6 +184,8 @@ void LoadConfig()
 
 	g_hMVPName.Clear();
 	g_hMVPPath.Clear();
+	g_hSteamids.Clear();
+	g_hMVPFlags.Clear();
 
 	g_hMenu = new Menu(MenuHandler_ListMVP);
 	g_hMenu.AddItem("", "None");
@@ -186,22 +197,50 @@ void LoadConfig()
 	g_iMVPCounter = 1;
 	if(kv.GotoFirstSubKey())
 	{
-		char sName[MAX_NAME_LENGTH], sPath[PLATFORM_MAX_PATH];
+		char sName[MAX_NAME_LENGTH], sPath[PLATFORM_MAX_PATH], sData[32];
 		char sIndex[4];
+		int iSteamids[STEAMID_LIMIT];
+		int iCounter;
 		do
 		{
+			// index + name
 			kv.GetSectionName(sName, sizeof(sName));
 			IntToString(g_iMVPCounter, sIndex, sizeof(sIndex));
 			g_hMVPName.SetString(sIndex, sName);
 
+			// path
 			kv.GetString("file", sPath, sizeof(sPath));
 			g_hMVPPath.SetString(sName, sPath);
 			
+			// Menu
 			g_hMenu.AddItem(sName, sName);
+
+			// Precache and download
 			PrecacheSound(sPath, true);
 			Format(sPath, sizeof(sPath), "sound/%s", sPath);
 			AddFileToDownloadsTable(sPath);
 
+			//flags
+			if(kv.GetString("flags", sData, sizeof(sData)))
+				g_hMVPFlags.SetString(sName, sData);
+			
+			// steamids
+			if(kv.JumpToKey("steamids"))
+			{
+				kv.GotoFirstSubKey();
+				iCounter = 0;
+				do{
+					kv.GetSectionName(sData, sizeof(sData));
+					iSteamids[iCounter] = StringToInt(sData);
+
+					iCounter++;
+				}
+				while(kv.GotoNextKey());
+				
+				kv.GoBack();
+				kv.GoBack();
+				g_hSteamids.SetArray(sName, iSteamids, STEAMID_LIMIT, true);
+			}
 			g_iMVPCounter++;
 		}
 		while (kv.GotoNextKey());
@@ -309,7 +348,7 @@ public int MenuHandler_ListMVP(Menu menu, MenuAction action, int client,int para
 			{
 				Menu nMenu = new Menu(MenuHandler_Options);
 				nMenu.SetTitle("> %s", sData);
-				nMenu.AddItem(sData, "Equip");
+				nMenu.AddItem(sData, "Equip", (UTIL_GetAccess(client, sData) && UTIL_GetFlagAccess(client, sData)) ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED);
 				nMenu.AddItem(sData, "Preview");
 				nMenu.ExitBackButton = true;
 				nMenu.Display(client, 0);
@@ -453,4 +492,34 @@ void SaveClientOptions(int client)
 	char sFormat[128];
 	FormatEx(sFormat, sizeof(sFormat), "%s;%.2f", g_sSelectedMVP[client], g_fVolume[client]);
 	SetClientCookie(client, g_hCookie, sFormat);
+}
+
+bool UTIL_GetAccess(int client, const char[] mvpname)
+{
+	int iArray[STEAMID_LIMIT];
+	if(g_hSteamids.GetArray(mvpname, iArray, sizeof(iArray)))
+	{
+		int steamid = GetSteamAccountID(client);
+		for(int i = 0; i < STEAMID_LIMIT; i++)
+		{
+			if(steamid == iArray[i])
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	return true;
+}
+
+bool UTIL_GetFlagAccess(int client, const char[] mvpname)
+{
+	char sFlags[8];
+	if(g_hSteamids.GetString(mvpname, sFlags, sizeof(sFlags)))
+	{
+		if(GetUserFlagBits(client) & ReadFlagString(sFlags))
+			return true;
+		return false;
+	}
+	return true;
 }
