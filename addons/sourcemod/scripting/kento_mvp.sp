@@ -20,14 +20,14 @@
 #include <sourcemod>
 #include <clientprefs>
 #include <sdktools>
-#include <multicolors>
+#include <karyuu>
 
 #define STEAMID_LIMIT 12 // steamids limit per MVP.
 
 int g_iMVPCounter;
 int g_iDisplayAt[MAXPLAYERS+1];
 
-StringMap g_hMVPName;
+ArrayList g_hMVPName;
 StringMap g_hMVPPath;
 StringMap g_hSteamids;
 StringMap g_hMVPFlags;
@@ -45,7 +45,7 @@ public Plugin myinfo =
 {
 	name = "[CS:GO] Custom MVP Anthem",
 	author = "Kento, .NiGHT",
-	version = "3.1",
+	version = "3.2",
 	description = "Custom MVP Anthem",
 	url = "https://github.com/NiGHT757/Custom-MVP-Anthem"
 };
@@ -55,11 +55,13 @@ public void OnPluginStart()
 	RegConsoleCmd("sm_mvp", Command_MVP, "Select Your MVP Anthem");
 	RegConsoleCmd("sm_mvpvol", Command_MVPVol, "MVP Volume");
 
+	RegAdminCmd("sm_reload_mvps", Command_Reload, ADMFLAG_RCON, "Reload MVP config");
+
 	HookEvent("round_mvp", Event_RoundMVP);
 
 	LoadTranslations("kento.mvp.phrases");
 
-	g_hMVPName = new StringMap();
+	g_hMVPName = new ArrayList(ByteCountToCells(64));
 	g_hMVPPath = new StringMap();
 	g_hSteamids = new StringMap();
 	g_hMVPFlags = new StringMap();
@@ -92,13 +94,12 @@ public void OnClientCookiesCached(int client)
 {
 	if(IsFakeClient(client))	return;
 
-	char sCookie[128];
-	GetClientCookie(client, g_hCookie, sCookie, sizeof(sCookie));
-	if(sCookie[0])
+	static char sExplode[2][128];
+	GetClientCookie(client, g_hCookie, sExplode[0], sizeof(sExplode[]));
+	if(sExplode[0][0])
 	{
-		char sExplode[2][128];
-		ExplodeString(sCookie, ";", sExplode, 2, 128); // sound + volume
-		if(sExplode[0][0] && g_hMVPPath.GetString(sExplode[0], sCookie, sizeof(sCookie)))
+		ExplodeString(sExplode[0], ";", sExplode, sizeof(sExplode), sizeof(sExplode[])); // sound + volume
+		if(sExplode[0][0] && g_hMVPPath.GetString(sExplode[0], "", 1))
 		{
 			if(UTIL_GetAccess(client, sExplode[0]) && UTIL_GetFlagAccess(client, sExplode[0]))
 				strcopy(g_sSelectedMVP[client], sizeof(g_sSelectedMVP[]), sExplode[0]);
@@ -156,8 +157,8 @@ public Action Event_RoundMVP(Event event, const char[] name, bool dontBroadcast)
 	else
 	{
 		char sPath[PLATFORM_MAX_PATH], sName[64];
-		IntToString(GetRandomInt(1, g_hMVPName.Size), sPath, 4); // get a random number
-		g_hMVPName.GetString(sPath, sName, sizeof(sName)); // find name by index
+		g_hMVPName.GetString(Karyuu_RandomInt(1, g_iMVPCounter), sName, sizeof(sName));
+
 		g_hMVPPath.GetString(sName, sPath, PLATFORM_MAX_PATH); // find path by mvp name
 		for(int iClient = 1; iClient <= MaxClients; iClient++)
 		{
@@ -198,15 +199,13 @@ void LoadConfig()
 	if(kv.GotoFirstSubKey())
 	{
 		char sName[MAX_NAME_LENGTH], sPath[PLATFORM_MAX_PATH], sData[32];
-		char sIndex[4];
 		int iSteamids[STEAMID_LIMIT];
 		int iCounter;
 		do
 		{
 			// index + name
 			kv.GetSectionName(sName, sizeof(sName));
-			IntToString(g_iMVPCounter, sIndex, sizeof(sIndex));
-			g_hMVPName.SetString(sIndex, sName);
+			g_hMVPName.PushString(sName);
 
 			// path
 			kv.GetString("file", sPath, sizeof(sPath));
@@ -239,15 +238,28 @@ void LoadConfig()
 				
 				kv.GoBack();
 				kv.GoBack();
-				g_hSteamids.SetArray(sName, iSteamids, STEAMID_LIMIT, true);
+				g_hSteamids.SetArray(sName, iSteamids, STEAMID_LIMIT);
 			}
-			g_iMVPCounter++;
 		}
 		while (kv.GotoNextKey());
 	}
-
+	g_iMVPCounter = g_hMVPName.Length;
 	kv.Rewind();
 	delete kv;
+}
+
+public Action Command_Reload(int client, int args)
+{
+	if(!client)
+	{
+		PrintToServer("[MVP] Config reloaded");
+		LoadConfig();
+		return Plugin_Handled;
+	}
+	
+	LoadConfig();
+	ReplyToCommand(client, "[MVP] Config reloaded");
+	return Plugin_Handled;
 }
 
 public Action Command_MVP(int client, int args)
@@ -320,9 +332,7 @@ public int MVPMenuHandler(Menu menu, MenuAction action, int client,int param)
 			}
 			else
 			{
-				char sIndex[4];
-				IntToString(param, sIndex, sizeof(sIndex));
-				g_hMVPName.GetString(sIndex, g_sSelectedMVP[client], sizeof(g_sSelectedMVP[]));
+				g_hMVPName.GetString(param, g_sSelectedMVP[client], sizeof(g_sSelectedMVP[]));
 				CPrintToChat(client, "%T", "MVP Anthem2", client, g_sSelectedMVP[client]);
 			}
 
