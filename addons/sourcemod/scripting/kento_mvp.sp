@@ -20,7 +20,7 @@
 #include <sourcemod>
 #include <clientprefs>
 #include <sdktools>
-#include <karyuu>
+#include <karyuu/plugin/chatprocessor>
 
 #define STEAMID_LIMIT 12 // steamids limit per MVP.
 
@@ -45,7 +45,7 @@ public Plugin myinfo =
 {
 	name = "[CS:GO] Custom MVP Anthem",
 	author = "Kento, .NiGHT",
-	version = "3.2",
+	version = "3.3",
 	description = "Custom MVP Anthem",
 	url = "https://github.com/NiGHT757/Custom-MVP-Anthem"
 };
@@ -157,7 +157,7 @@ public Action Event_RoundMVP(Event event, const char[] name, bool dontBroadcast)
 	else
 	{
 		char sPath[PLATFORM_MAX_PATH], sName[64];
-		g_hMVPName.GetString(Karyuu_RandomInt(1, g_iMVPCounter), sName, sizeof(sName));
+		g_hMVPName.GetString(Karyuu_RandomInt(0, g_iMVPCounter-1), sName, sizeof(sName));
 
 		g_hMVPPath.GetString(sName, sPath, PLATFORM_MAX_PATH); // find path by mvp name
 		for(int iClient = 1; iClient <= MaxClients; iClient++)
@@ -317,6 +317,7 @@ public int SettingsMenuHandler(Menu menu, MenuAction action, int client, int par
 			delete menu;
 		}
 	}
+	return 0;
 }
 
 public int MVPMenuHandler(Menu menu, MenuAction action, int client,int param)
@@ -343,6 +344,7 @@ public int MVPMenuHandler(Menu menu, MenuAction action, int client,int param)
 			delete menu;
 		}
 	}
+	return 0;
 }
 
 public int MenuHandler_ListMVP(Menu menu, MenuAction action, int client,int param)
@@ -377,6 +379,7 @@ public int MenuHandler_ListMVP(Menu menu, MenuAction action, int client,int para
 			}
 		}
 	}
+	return 0;
 }
 
 public int MenuHandler_Options(Menu menu, MenuAction action, int client,int param)
@@ -412,6 +415,7 @@ public int MenuHandler_Options(Menu menu, MenuAction action, int client,int para
 		}
 		case MenuAction_End: delete menu;
 	}
+	return 0;
 }
 
 void DisplayVolMenu(int client)
@@ -463,11 +467,12 @@ public int VolMenuHandler(Menu menu, MenuAction action, int client,int param)
 			delete menu;
 		}
 	}
+	return 0;
 }
 
 public Action Command_MVPVol(int client,int args)
 {
-	if (!IsClientInGame(client))
+	if (!client || !IsClientInGame(client))
 	{
 		return Plugin_Handled;
 	}
@@ -532,4 +537,14 @@ bool UTIL_GetFlagAccess(int client, const char[] mvpname)
 		return false;
 	}
 	return true;
+}
+
+stock int Karyuu_RandomInt(int iMin, int iMax)
+{
+	return RoundToZero(Karyuu_RandomFloat(float(iMin), float(iMax)));
+}
+
+stock float Karyuu_RandomFloat(float iMin, float iMax)
+{
+	return GetURandomFloat() * (iMax - iMin) + iMin;
 }
