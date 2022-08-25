@@ -51,55 +51,55 @@
 	"Selected"
 	{
 		"#format"		"{1:s}"
-		"en"			"[{DARKRED}MVP{DEFAULT}] Your MVP Anthem is {purple}{1}."
+		"en"			"[{darkred}MVP{default}] Your MVP Anthem is {purple}{1}."
 	}
 
 	"No Selected"
 	{
 		"#format"		""
-		"en"			"[{DARKRED}MVP{DEFAULT}] Your MVP Anthem is {purple}No MVP Anthem{DEFAULT}."
+		"en"			"[{darkred}MVP{default}] Your MVP Anthem is {purple}No MVP Anthem{default}."
 	}
 
 	"Volume 1"
 	{
 		"#format"		""
-		"en"			"[{DARKRED}MVP{DEFAULT}] Volume values must be {DARKRED}0.0- 1.0"
+		"en"			"[{darkred}MVP{default}] Volume values must be {darkred}0.0- 1.0"
 	}
 
 	"Volume 2"
 	{
 		"#format"		"{1:.2f}"
-		"en"			"[{DARKRED}MVP{DEFAULT}] Volume is set to {purple}{1}"
+		"en"			"[{darkred}MVP{default}] Volume is set to {purple}{1}"
 	}
 	
 	"Preview"
 	{
 		"#format"		"{1:s}"
-		"en"			"[{DARKRED}MVP{DEFAULT}] Preview for {purple}{1}{DEFAULT}."
+		"en"			"[{darkred}MVP{default}] Preview for {purple}{1}{default}."
 	}
 
 	"Save MVP Anthem"
 	{
 		"#format"		"{1:s}"
-		"en"			"[{DARKRED}MVP{DEFAULT}] Your MVP Anthem is {purple}{1}{DEFAULT}."
+		"en"			"[{darkred}MVP{default}] Your MVP Anthem is {purple}{1}{default}."
 	}
 	
 	"Save MVP Anthem - None"
 	{
 		"#format"		""
-		"en"			"[{DARKRED}MVP{DEFAULT}] Your MVP Anthem is {purple}No MVP Anthem{DEFAULT}."
+		"en"			"[{darkred}MVP{default}] Your MVP Anthem is {purple}No MVP Anthem{default}."
 	}
 
 	"MVP Anthem Random"
 	{
 		"#format"		"{1:s}"
-		"en"			"[{DARKRED}MVP{DEFAULT}] Now playing random MVP Anthem - {purple}{1}"
+		"en"			"[{darkred}MVP{default}] Now playing random MVP Anthem - {purple}{1}"
 	}
 
 	"MVP Anthem"
 	{
 		"#format"		"{1:N},{2:s}"
-		"en"			"[{DARKRED}MVP{DEFAULT}] Now playing {DARKRED}{1}{DEFAULT}'s MVP Anthem - {purple}{2}"
+		"en"			"[{darkred}MVP{default}] Now playing {darkred}{1}{default}'s MVP Anthem - {purple}{2}"
 	}
 
 	"Select MVP Anthem"
